@@ -6,31 +6,37 @@ import {
   ResolveProperty,
   Resolver,
 } from '@nestjs/graphql';
-import { PrismaService } from '../prisma/prisma.service';
 import { Post } from '../graphql.schema.generated';
 import { GqlUser } from '../shared/decorators/decorators';
 import { User } from '../../generated/prisma-client';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../auth/graphql-auth.guard';
 import { PostInputDto } from './post-input.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { PostEntity } from './post.entity';
 
 @Resolver('Post')
 export class PostResolver {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @InjectRepository(PostEntity)
+    private postRepository: Repository<PostEntity>,
+  ) {}
 
   @Query()
   async post(@Args('id') id: string) {
-    return this.prisma.client.post({ id });
+    return this.postRepository.findOne(id);
   }
 
   @Query()
   async posts() {
-    return this.prisma.client.posts();
+    return this.postRepository.find();
   }
 
   @ResolveProperty()
   async author(@Parent() { id }: Post) {
-    return this.prisma.client.post({ id }).author();
+    return (await this.postRepository.findOne(id, { relations: ['author'] }))
+      .author;
   }
 
   @Mutation()
@@ -39,10 +45,10 @@ export class PostResolver {
     @Args('postInput') { title, body }: PostInputDto,
     @GqlUser() user: User,
   ) {
-    return this.prisma.client.createPost({
+    return this.postRepository.save({
       title,
       body,
-      author: { connect: { id: user.id } },
+      author: { id: user.id },
     });
   }
 }

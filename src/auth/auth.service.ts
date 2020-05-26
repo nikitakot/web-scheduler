@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { User } from '../../generated/prisma-client';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from '../user/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @InjectRepository(UserEntity)
+    private usersRepository: Repository<UserEntity>,
+  ) {}
 
-  async validate({ id }): Promise<User> {
-    const user = await this.prisma.client.user({ id });
+  async validate({ id }): Promise<UserEntity> {
+    const user = await this.usersRepository.findOne(id);
     if (!user) {
       throw Error('Authenticate validation error');
     }

@@ -1,13 +1,19 @@
 import { Parent, ResolveProperty, Resolver } from '@nestjs/graphql';
-import { PrismaService } from '../prisma/prisma.service';
 import { User } from '../graphql.schema.generated';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from './user.entity';
+import { Repository } from 'typeorm';
 
 @Resolver('User')
 export class UserResolver {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @InjectRepository(UserEntity)
+    private usersRepository: Repository<UserEntity>,
+  ) {}
 
   @ResolveProperty()
   async post(@Parent() { id }: User) {
-    return this.prisma.client.user({ id }).post();
+    return (await this.usersRepository.findOne(id, { relations: ['post'] }))
+      .post;
   }
 }

@@ -18,7 +18,8 @@
   "linterOptions": {
     "exclude": [
       "src/graphql.schema.generated.ts",
-      "generated/**/*"
+      "generated/**/*",
+      "database/**/*"
     ]
   }
 }

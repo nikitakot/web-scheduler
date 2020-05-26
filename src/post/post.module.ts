@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PostResolver } from './post.resolver';
-import { PrismaModule } from '../prisma/prisma.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PostEntity } from './post.entity';
 
 @Module({
   providers: [PostResolver],
-  imports: [PrismaModule],
+  imports: [TypeOrmModule.forFeature([PostEntity])],
 })
 export class PostModule {}
