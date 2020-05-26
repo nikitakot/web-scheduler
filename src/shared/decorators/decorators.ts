@@ -1,7 +1,7 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Response } from 'express';
-import { User } from '../../../generated/prisma-client';
+import { UserEntity } from '../../user/user.entity';
 
 export const ResGql = createParamDecorator(
   (data: unknown, context: ExecutionContext): Response =>
@@ -9,7 +9,7 @@ export const ResGql = createParamDecorator(
 );
 
 export const GqlUser = createParamDecorator(
-  (data: unknown, context: ExecutionContext): User => {
+  (data: unknown, context: ExecutionContext): UserEntity => {
     const ctx = GqlExecutionContext.create(context).getContext();
     return ctx.req && ctx.req.user;
   },

@@ -1,4 +1,4 @@
-import { Parent, ResolveProperty, Resolver } from '@nestjs/graphql';
+import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import { User } from '../graphql.schema.generated';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
@@ -11,7 +11,7 @@ export class UserResolver {
     private usersRepository: Repository<UserEntity>,
   ) {}
 
-  @ResolveProperty()
+  @ResolveField()
   async post(@Parent() { id }: User) {
     return (await this.usersRepository.findOne(id, { relations: ['post'] }))
       .post;
