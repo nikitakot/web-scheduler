@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
 import { Repository } from 'typeorm';
 
-@Resolver('User')
+@Resolver(User)
 export class UserResolver {
   constructor(
     @InjectRepository(UserEntity)

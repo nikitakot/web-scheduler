@@ -16,7 +16,7 @@ import { Repository } from 'typeorm';
 import { PostEntity } from './post.entity';
 import { UserEntity } from '../user/user.entity';
 
-@Resolver('Post')
+@Resolver(Post)
 export class PostResolver {
   constructor(
     @InjectRepository(PostEntity)
