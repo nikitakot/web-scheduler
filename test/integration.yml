@@ -8,7 +8,9 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    volumes:
-      - postgres:/var/lib/postgresql/data
-volumes:
-  postgres: ~
+  wait-postgres:
+    image: waisbrot/wait
+    links:
+      - postgres
+    environment:
+      - TARGETS=db:5432

@@ -9,5 +9,4 @@ export default (configService: ConfigService): TypeOrmModuleOptions => ({
   password: configService.get('POSTGRES_PASSWORD'),
   database: configService.get('POSTGRES_DATABASE'),
   entities: ['**/*.entity{.ts,.js}'],
-  logging: true,
 });
