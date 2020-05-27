@@ -1,30 +1,27 @@
-<h1 align="center">
-  <a href="https://github.com/nikitakot/nestjs-boilerplate"><img src="https://thepracticaldev.s3.amazonaws.com/i/whtmfhi1tmpsq1vgblhc.jpg" alt="NodeJS boilerplate" width=500"></a>
-</h1>
-
 ## Description
 
-Boilerplate application from this [tutorial](https://dev.to/nikitakot/building-nestjs-app-boilerplate-authentication-validation-graphql-and-prisma-f1d).
+Boilerplate application with Nest.js, TypeORM & GraphQL.
+
+## Pre-requirements
+
+- node.js (tested on v. 12.6.0)
+- docker
+- docker-compose
 
 ## Installation
 
 ```bash
 $ npm install
-$ docker-compose up -d
-$ prisma deploy
 ```
 
 ## Running the app
 
 ```bash
 # development
-$ JWT_SECRET=secret npm run start
+$ npm run start:local
 
-# watch mode
-$ JWT_SECRET=secret npm run start:dev
-
-# production mode
-$ JWT_SECRET=secret npm run start:prod
+# integration tests
+$ npm run test:integration
 ```
 
 ## License
