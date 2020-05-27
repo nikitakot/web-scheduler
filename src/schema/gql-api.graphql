@@ -28,6 +28,12 @@ input PostInput {
   body: String
 }
 
+input UpdatePostInput {
+  id: ID!
+  title: String!
+  body: String
+}
+
 type AuthPayload {
   id: ID!
   email: String!
@@ -42,4 +48,5 @@ type Mutation {
   signup(signUpInput: SignUpInput): AuthPayload!
   login(loginInput: LoginInput): AuthPayload!
   createPost(postInput: PostInput): Post!
+  updatePost(updatePostInput: UpdatePostInput): Post!
 }

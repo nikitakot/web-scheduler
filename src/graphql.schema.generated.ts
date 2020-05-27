@@ -21,6 +21,12 @@ export class SignUpInput {
     password: string;
 }
 
+export class UpdatePostInput {
+    id: string;
+    title: string;
+    body?: string;
+}
+
 export class AuthPayload {
     id: string;
     email: string;
@@ -32,6 +38,8 @@ export abstract class IMutation {
     abstract login(loginInput?: LoginInput): AuthPayload | Promise<AuthPayload>;
 
     abstract createPost(postInput?: PostInput): Post | Promise<Post>;
+
+    abstract updatePost(updatePostInput?: UpdatePostInput): Post | Promise<Post>;
 }
 
 export class Post {
