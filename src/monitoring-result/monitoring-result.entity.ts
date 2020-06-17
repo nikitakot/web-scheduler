@@ -10,9 +10,6 @@ export class MonitoringResultEntity extends BaseEntity {
   @Column()
   payload: string;
 
-  @Column({ type: 'timestamptz', nullable: true })
-  checkedAt?: Date;
-
   @ManyToOne(
     type => MonitoredEndpointEntity,
     monitoredEndpoint => monitoredEndpoint.monitoringResult,

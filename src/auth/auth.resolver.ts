@@ -1,8 +1,6 @@
 import * as bcryptjs from 'bcryptjs';
-import { Response } from 'express';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { LoginInput } from '../graphql.schema.generated';
-import { ResGql } from '../shared/decorators/decorators';
 import { JwtService } from '@nestjs/jwt';
 import { SignUpInputDto } from './sign-up-input.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,10 +16,7 @@ export class AuthResolver {
   ) {}
 
   @Mutation()
-  async login(
-    @Args('loginInput') { email, password }: LoginInput,
-    @ResGql() res: Response,
-  ) {
+  async login(@Args('loginInput') { email, password }: LoginInput) {
     const user = await this.usersRepository.findOne({ email });
     if (!user) {
       throw Error('Email or password incorrect');
@@ -38,10 +33,7 @@ export class AuthResolver {
   }
 
   @Mutation()
-  async signup(
-    @Args('signUpInput') signUpInputDto: SignUpInputDto,
-    @ResGql() res: Response,
-  ) {
+  async signup(@Args('signUpInput') signUpInputDto: SignUpInputDto) {
     const emailExists = !!(await this.usersRepository.findOne({
       email: signUpInputDto.email,
     }));

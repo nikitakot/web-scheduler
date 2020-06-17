@@ -1,9 +1,9 @@
+scalar Date
+
 type User {
   id: ID!
   username: String!
   monitoredEndpoint: [MonitoredEndpoint!]!
-  createdAt: String!
-  updatedAt: String!
 }
 
 type MonitoredEndpoint {
@@ -11,11 +11,12 @@ type MonitoredEndpoint {
   name: String!
   url: String!
   monitoredInterval: Int!
+  disabled: Boolean!
   owner: User!
   monitoringResult(first: Int = 10): [MonitoringResult!]!
-  createdAt: String!
-  updatedAt: String!
-  checkedAt: String
+  createdAt: Date!
+  updatedAt: Date!
+  checkedAt: Date
 }
 
 type MonitoringResult {
@@ -23,9 +24,8 @@ type MonitoringResult {
   statusCode: Int!
   payload: String!
   monitoredEndpoint: MonitoredEndpoint!
-  createdAt: String!
-  updatedAt: String!
-  checkedAt: String
+  createdAt: Date!
+  updatedAt: Date!
 }
 
 input SignUpInput {
@@ -48,9 +48,9 @@ input MonitoredEndpointInput {
 
 input UpdateMonitoredEndpointInput {
   id: ID!
-  name: String!
-  url: String!
-  monitoredInterval: Int!
+  name: String
+  url: String
+  monitoredInterval: Int
   disabled: Boolean
 }
 

@@ -10,9 +10,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MonitoredEndpointModule } from './monitored-endpoint/monitored-endpoint.module';
 import { MonitoringResultModule } from './monitoring-result/monitoring-result.module';
 import TypeOrmOptions from './typeorm.options';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     GraphQLModule.forRootAsync({
       useClass: GraphqlOptions,
     }),
@@ -26,6 +29,7 @@ import TypeOrmOptions from './typeorm.options';
     }),
     MonitoredEndpointModule,
     MonitoringResultModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [

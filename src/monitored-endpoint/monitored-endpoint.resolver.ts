@@ -12,6 +12,7 @@ import { Like, Repository } from 'typeorm';
 import { MonitoredEndpoint } from '../graphql.schema.generated';
 import { MonitoringResultEntity } from '../monitoring-result/monitoring-result.entity';
 import {
+  BadRequestException,
   ForbiddenException,
   NotFoundException,
   UseGuards,
@@ -23,6 +24,7 @@ import {
   MonitoredEndpointDto,
   UpdateMonitoredEndpointDto,
 } from './monitored-endpoint.dto';
+import { TasksService } from '../tasks/tasks.service';
 
 @Resolver(MonitoredEndpoint)
 export class MonitoredEndpointResolver {
@@ -31,6 +33,7 @@ export class MonitoredEndpointResolver {
     private monitoredEndpointRepository: Repository<MonitoredEndpointEntity>,
     @InjectRepository(MonitoringResultEntity)
     private monitoringResultRepository: Repository<MonitoringResultEntity>,
+    private tasksService: TasksService,
   ) {}
 
   @ResolveField()
@@ -41,10 +44,25 @@ export class MonitoredEndpointResolver {
   }
 
   @ResolveField()
+  async checkedAt(@Parent() { id }: MonitoredEndpoint) {
+    const monitoringResult = await this.monitoringResultRepository.findOne({
+      order: { createdAt: 'DESC' }, // TODO might be not performant, index the column
+      where: { monitoredEndpoint: { id } },
+    });
+
+    if (monitoringResult) {
+      return monitoringResult.createdAt;
+    }
+  }
+
+  @ResolveField()
   async monitoringResult(
     @Args('first') first: number,
     @Parent() { id }: MonitoredEndpoint,
   ) {
+    if (first < 0) {
+      return new BadRequestException('first must not be negative');
+    }
     return this.monitoringResultRepository.find({
       take: first,
       order: { createdAt: 'DESC' }, // TODO might be not performant, index the column
@@ -55,9 +73,18 @@ export class MonitoredEndpointResolver {
   @Query()
   @UseGuards(GqlAuthGuard)
   async monitoredEndpoint(@Args('id') id: string, @GqlUser() user: UserEntity) {
-    return this.monitoredEndpointRepository.findOne(id, {
-      where: { owner: { id: user.id } },
-    });
+    const monitoredEndpoint = await this.monitoredEndpointRepository.findOne(
+      id,
+      {
+        where: { owner: { id: user.id } },
+      },
+    );
+
+    if (!monitoredEndpoint) {
+      throw new NotFoundException();
+    }
+
+    return monitoredEndpoint;
   }
 
   @Query()
@@ -85,10 +112,18 @@ export class MonitoredEndpointResolver {
     monitoredEndpointInput: MonitoredEndpointDto,
     @GqlUser() user: UserEntity,
   ) {
-    return this.monitoredEndpointRepository.save({
+    const { id } = await this.monitoredEndpointRepository.save({
       ...monitoredEndpointInput,
       owner: { id: user.id },
     });
+
+    const monitoredEndpoint = await this.monitoredEndpointRepository.findOne(
+      id,
+    );
+
+    this.tasksService.schedule(monitoredEndpoint);
+
+    return monitoredEndpoint;
   }
 
   @Mutation()
@@ -111,8 +146,16 @@ export class MonitoredEndpointResolver {
       throw new ForbiddenException();
     }
 
-    return this.monitoredEndpointRepository.save({
+    await this.monitoredEndpointRepository.save({
       ...updateMonitoredEndpointInput,
     });
+
+    const monitoredEndpointUpdated = await this.monitoredEndpointRepository.findOne(
+      updateMonitoredEndpointInput.id,
+    );
+
+    this.tasksService.schedule(monitoredEndpointUpdated);
+
+    return monitoredEndpointUpdated;
   }
 }

@@ -17,9 +17,6 @@ export class MonitoredEndpointEntity extends BaseEntity {
   @Column({ default: false })
   disabled: boolean;
 
-  @Column({ type: 'timestamptz', nullable: true })
-  checkedAt?: Date;
-
   @ManyToOne(type => UserEntity, user => user.monitoredEndpoint)
   owner: UserEntity;
 

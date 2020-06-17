@@ -2,19 +2,27 @@ import {
   MonitoredEndpointInput,
   UpdateMonitoredEndpointInput,
 } from '../graphql.schema.generated';
-import { IsBoolean, IsInt, IsNotEmpty, IsUrl, IsUUID } from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsUrl,
+  IsUUID,
+} from 'class-validator';
 
 export class MonitoredEndpointDto extends MonitoredEndpointInput {
   @IsNotEmpty()
   name: string;
 
-  @IsUrl()
+  @IsUrl({ require_protocol: true })
   url: string;
 
   @IsInt()
   monitoredInterval: number;
 
   @IsBoolean()
+  @IsOptional()
   disabled?: boolean;
 }
 
@@ -23,14 +31,18 @@ export class UpdateMonitoredEndpointDto extends UpdateMonitoredEndpointInput {
   id: string;
 
   @IsNotEmpty()
+  @IsOptional()
   name: string;
 
-  @IsUrl()
+  @IsUrl({ require_valid_protocol: true })
+  @IsOptional()
   url: string;
 
   @IsInt()
+  @IsOptional()
   monitoredInterval: number;
 
   @IsBoolean()
+  @IsOptional()
   disabled?: boolean;
 }

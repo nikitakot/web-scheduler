@@ -1,4 +1,8 @@
-import { GqlModuleOptions, GqlOptionsFactory } from '@nestjs/graphql';
+import {
+  GqlModuleOptions,
+  GqlOptionsFactory,
+  GraphQLISODateTime,
+} from '@nestjs/graphql';
 import { Injectable } from '@nestjs/common';
 import { join } from 'path';
 
@@ -8,6 +12,7 @@ export class GraphqlOptions implements GqlOptionsFactory {
     return {
       context: ({ req, res }) => ({ req, res }),
       typePaths: ['./src/*/*.graphql'], // path for gql schema files
+      resolvers: { Date: GraphQLISODateTime },
       installSubscriptionHandlers: true,
       resolverValidationOptions: {
         requireResolversForResolveType: false,
