@@ -3,12 +3,14 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { INestApplication } from '@nestjs/common';
 import { Connection } from 'typeorm';
-import { createPost, signup } from './gql/queries';
-import * as cookieParser from 'cookie-parser';
+import { createMonitoredEndpoint, signup } from './gql/queries';
+import { SchedulerRegistry } from '@nestjs/schedule';
+import { MONITORING_TASK_PREFIX } from '../src/shared/constants/constants';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
-  let dummyUser: { email: string; token: string };
+  let taskScheduler: SchedulerRegistry;
+  let dummyUser: { email: string; token: string; id: string };
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -16,23 +18,25 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.use(cookieParser());
     await app.init();
 
+    taskScheduler = app.get(SchedulerRegistry);
+
     const email = 'test@user.com';
-    const token = (await request(app.getHttpServer())
+    const username = 'test';
+    const { id, jwt } = (await request(app.getHttpServer())
       .post('/graphql')
       .send({
-        query: signup(email, 'password'),
-      })).header['set-cookie'][0]
-      .split(';')[0]
-      .replace('token=', '');
-    dummyUser = { email, token };
+        query: signup(email, username, 'password'),
+      })).body.data.signup;
+    dummyUser = { email, token: jwt, id };
   });
 
   afterAll(async () => {
     const db = app.get(Connection);
     await db.close();
+
+    taskScheduler.getIntervals().forEach(t => taskScheduler.deleteInterval(t));
   });
 
   it('/livecheck', () => {
@@ -47,30 +51,33 @@ describe('AppController (e2e)', () => {
       return request(app.getHttpServer())
         .post('/graphql')
         .send({
-          query: signup('email@email.com', 'password'),
+          query: signup('email@email.com', 'dummy', 'password'),
         })
         .expect(({ body, header }) => {
           expect(body.data.signup.id).toBeDefined();
-          expect(header['set-cookie'][0]).toEqual(
-            expect.stringContaining('token'),
-          );
+          expect(body.data.signup.jwt).toBeDefined();
         });
     });
   });
 
-  describe('post', () => {
-    it('should create post', () => {
+  describe('monitoring', () => {
+    it('should create monitoring endpoint and task', () => {
       return request(app.getHttpServer())
         .post('/graphql')
-        .set('Cookie', [`token=${dummyUser.token}`])
+        .set('authorization', `Bearer ${dummyUser.token}`)
         .send({
-          query: createPost('new interesting post', 'new body'),
+          query: createMonitoredEndpoint(
+            'new endpoint',
+            'https://google.com',
+            60,
+          ),
         })
         .expect(200)
         .expect(({ body }) => {
-          expect(body.data.createPost.id).toBeDefined();
-          expect(body.data.createPost.title).toEqual('new interesting post');
-          expect(body.data.createPost.author.email).toEqual(dummyUser.email);
+          const id = body.data.createMonitoredEndpoint.id;
+          expect(id).toBeDefined();
+          expect(body.data.createMonitoredEndpoint.createdAt).toBeDefined();
+          expect(taskScheduler.getInterval(MONITORING_TASK_PREFIX + id));
         });
     });
   });
