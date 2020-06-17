@@ -101,7 +101,7 @@ query {
 }
 ```
 
-This mutation will only display endpoint for the currently logged
+This mutation will only display endpoints for the currently logged
 user based on JWT.
 
 6. Check the GQL schema, there are more mutations and queries there

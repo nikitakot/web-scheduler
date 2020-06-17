@@ -38,9 +38,9 @@ export class MonitoredEndpointResolver {
 
   @ResolveField()
   async owner(@Parent() { id }: MonitoredEndpoint) {
-    return this.monitoredEndpointRepository.findOne(id, {
+    return (await this.monitoredEndpointRepository.findOne(id, {
       relations: ['owner'],
-    });
+    })).owner;
   }
 
   @ResolveField()

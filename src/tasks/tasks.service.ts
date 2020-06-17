@@ -40,7 +40,9 @@ export class TasksService implements OnApplicationBootstrap {
         `Interval ${name} executing at time (${entity.monitoredInterval})!`,
       );
       try {
-        const response = await this.httpService.get(entity.url).toPromise();
+        const response = await this.httpService
+          .get(entity.url, { validateStatus: (status) => true })
+          .toPromise();
         await this.monitoringResultRepository.save({
           statusCode: response.status,
           monitoredEndpoint: { id: entity.id },
