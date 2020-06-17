@@ -12,8 +12,9 @@ export class UserResolver {
   ) {}
 
   @ResolveField()
-  async post(@Parent() { id }: User) {
-    return (await this.usersRepository.findOne(id, { relations: ['post'] }))
-      .post;
+  async monitoredEndpoint(@Parent() { id }: User) {
+    return (await this.usersRepository.findOne(id, {
+      relations: ['monitoredEndpoint'],
+    })).monitoredEndpoint;
   }
 }

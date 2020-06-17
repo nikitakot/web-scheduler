@@ -10,7 +10,9 @@ services:
       POSTGRES_PASSWORD: postgres
   wait-postgres:
     image: waisbrot/wait
+    depends_on:
+      - postgres
     links:
       - postgres
     environment:
-      - TARGETS=db:5432
+      - TARGETS=postgres:5432

@@ -1,3 +1,4 @@
+
 /** ------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
  * -------------------------------------------------------
@@ -6,60 +7,82 @@
 /* tslint:disable */
 /* eslint-disable */
 export class LoginInput {
-  email: string;
-  password: string;
+    email: string;
+    password: string;
 }
 
-export class PostInput {
-  title: string;
-  body?: string;
+export class MonitoredEndpointInput {
+    name: string;
+    url: string;
+    monitoredInterval: number;
+    disabled?: boolean;
 }
 
 export class SignUpInput {
-  email: string;
-  password: string;
+    username: string;
+    email: string;
+    password: string;
 }
 
-export class UpdatePostInput {
-  id: string;
-  title: string;
-  body?: string;
+export class UpdateMonitoredEndpointInput {
+    id: string;
+    name: string;
+    url: string;
+    monitoredInterval: number;
+    disabled?: boolean;
 }
 
 export class AuthPayload {
-  id: string;
-  email: string;
+    id: string;
+    username: string;
+    email: string;
+    jwt: string;
+}
+
+export class MonitoredEndpoint {
+    id: string;
+    name: string;
+    url: string;
+    monitoredInterval: number;
+    owner: User;
+    monitoringResult: MonitoringResult[];
+    createdAt: string;
+    updatedAt: string;
+    checkedAt?: string;
+}
+
+export class MonitoringResult {
+    id: string;
+    statusCode: number;
+    payload: string;
+    monitoredEndpoint: MonitoredEndpoint;
+    createdAt: string;
+    updatedAt: string;
+    checkedAt?: string;
 }
 
 export abstract class IMutation {
-  abstract signup(
-    signUpInput?: SignUpInput,
-  ): AuthPayload | Promise<AuthPayload>;
+    abstract signup(signUpInput?: SignUpInput): AuthPayload | Promise<AuthPayload>;
 
-  abstract login(loginInput?: LoginInput): AuthPayload | Promise<AuthPayload>;
+    abstract login(loginInput?: LoginInput): AuthPayload | Promise<AuthPayload>;
 
-  abstract createPost(postInput?: PostInput): Post | Promise<Post>;
+    abstract createMonitoredEndpoint(monitoredEndpointInput?: MonitoredEndpointInput): MonitoredEndpoint | Promise<MonitoredEndpoint>;
 
-  abstract updatePost(updatePostInput?: UpdatePostInput): Post | Promise<Post>;
-}
-
-export class Post {
-  id: string;
-  title: string;
-  body?: string;
-  author: User;
+    abstract updateMonitoredEndpoint(updateMonitoredEndpointInput?: UpdateMonitoredEndpointInput): MonitoredEndpoint | Promise<MonitoredEndpoint>;
 }
 
 export abstract class IQuery {
-  abstract post(id: string): Post | Promise<Post>;
+    abstract monitoredEndpoint(id: string): MonitoredEndpoint | Promise<MonitoredEndpoint>;
 
-  abstract posts(): Post[] | Promise<Post[]>;
+    abstract monitoredEndpoints(): MonitoredEndpoint[] | Promise<MonitoredEndpoint[]>;
+
+    abstract findMonitoredEndpoints(url: string): MonitoredEndpoint[] | Promise<MonitoredEndpoint[]>;
 }
 
 export class User {
-  id: string;
-  email: string;
-  post: Post[];
-  createdAt: string;
-  updatedAt: string;
+    id: string;
+    username: string;
+    monitoredEndpoint: MonitoredEndpoint[];
+    createdAt: string;
+    updatedAt: string;
 }

@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "db:stop": "docker rm -f postgres-nestjs || true",
-    "db:integration": "npm run db:stop && docker-compose -f docker/integration.yml up -d",
+    "db:integration": "npm run db:stop && docker-compose -f docker/integration.yml up wait-postgres",
     "db:development": "npm run db:stop && docker-compose -f docker/development.yml up -d",
     "test:integration": "npm run db:integration && cp config/.integration.env .env && NODE_ENV=integration npm run typeorm:migrate && npm run test:e2e",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js --config database/db-config.ts",

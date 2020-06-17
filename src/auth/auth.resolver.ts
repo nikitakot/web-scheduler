@@ -33,9 +33,8 @@ export class AuthResolver {
     }
 
     const jwt = this.jwt.sign({ id: user.id });
-    res.cookie('token', jwt, { httpOnly: true });
 
-    return user;
+    return { ...user, jwt };
   }
 
   @Mutation()
@@ -49,6 +48,14 @@ export class AuthResolver {
     if (emailExists) {
       throw Error('Email is already in use');
     }
+
+    const usernameExists = !!(await this.usersRepository.findOne({
+      username: signUpInputDto.username,
+    }));
+    if (usernameExists) {
+      throw Error('Username is already taken');
+    }
+
     const password = await bcryptjs.hash(signUpInputDto.password, 10);
 
     const user = await this.usersRepository.save({
@@ -57,8 +64,7 @@ export class AuthResolver {
     });
 
     const jwt = this.jwt.sign({ id: user.id });
-    res.cookie('token', jwt, { httpOnly: true });
 
-    return user;
+    return { ...user, jwt };
   }
 }

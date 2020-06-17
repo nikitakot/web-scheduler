@@ -1,19 +1,35 @@
 type User {
   id: ID!
-  email: String!
-  post: [Post!]!
+  username: String!
+  monitoredEndpoint: [MonitoredEndpoint!]!
   createdAt: String!
   updatedAt: String!
 }
 
-type Post {
+type MonitoredEndpoint {
   id: ID!
-  title: String!
-  body: String
-  author: User!
+  name: String!
+  url: String!
+  monitoredInterval: Int!
+  owner: User!
+  monitoringResult(first: Int = 10): [MonitoringResult!]!
+  createdAt: String!
+  updatedAt: String!
+  checkedAt: String
+}
+
+type MonitoringResult {
+  id: ID!
+  statusCode: Int!
+  payload: String!
+  monitoredEndpoint: MonitoredEndpoint!
+  createdAt: String!
+  updatedAt: String!
+  checkedAt: String
 }
 
 input SignUpInput {
+  username: String!
   email: String!
   password: String!
 }
@@ -23,30 +39,41 @@ input LoginInput {
   password: String!
 }
 
-input PostInput {
-  title: String!
-  body: String
+input MonitoredEndpointInput {
+  name: String!
+  url: String!
+  monitoredInterval: Int!
+  disabled: Boolean
 }
 
-input UpdatePostInput {
+input UpdateMonitoredEndpointInput {
   id: ID!
-  title: String!
-  body: String
+  name: String!
+  url: String!
+  monitoredInterval: Int!
+  disabled: Boolean
 }
 
 type AuthPayload {
   id: ID!
+  username: String!
   email: String!
+  jwt: String!
 }
 
 type Query {
-  post(id: ID!): Post!
-  posts: [Post!]!
+  monitoredEndpoint(id: ID!): MonitoredEndpoint!
+  monitoredEndpoints: [MonitoredEndpoint!]!
+  findMonitoredEndpoints(url: String!): [MonitoredEndpoint!]!
 }
 
 type Mutation {
   signup(signUpInput: SignUpInput): AuthPayload!
   login(loginInput: LoginInput): AuthPayload!
-  createPost(postInput: PostInput): Post!
-  updatePost(updatePostInput: UpdatePostInput): Post!
+  createMonitoredEndpoint(
+    monitoredEndpointInput: MonitoredEndpointInput
+  ): MonitoredEndpoint!
+  updateMonitoredEndpoint(
+    updateMonitoredEndpointInput: UpdateMonitoredEndpointInput
+  ): MonitoredEndpoint!
 }
